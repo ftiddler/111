@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    permissions: []
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_PERMISSIONS: (state, permissions) => {
+    state.permissions = permissions
   }
 }
 
@@ -53,8 +57,14 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { permissions, name, avatar } = data
 
+        // roles must be a non-empty array
+        if (!permissions || permissions.length <= 0) {
+          reject('getInfo: permissions must be a non-null array!')
+        }
+
+        commit('SET_PERMISSIONS', permissions)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)
@@ -68,6 +78,8 @@ const actions = {
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
+        commit('SET_TOKEN', '')
+        commit('SET_PERMISSIONS', [])
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
