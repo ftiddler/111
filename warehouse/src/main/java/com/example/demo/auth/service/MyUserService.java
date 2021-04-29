@@ -2,6 +2,7 @@ package com.example.demo.auth.service;
 
 import com.example.demo.auth.entity.UserInfo;
 import com.example.demo.common.ResponseData;
+import com.example.demo.entity.User;
 
 /**
  * @author GuoWei
@@ -19,5 +20,11 @@ public interface MyUserService {
      */
     UserInfo getInfo(String token);
 
-    ResponseData insertUser(String username, String password, String authority, String account);
+    ResponseData selectAll();
+
+    ResponseData insertUser(User user);
+
+    ResponseData deleteByAccount(String account);
+
+    ResponseData changePasswordByAccount(User user);
 }

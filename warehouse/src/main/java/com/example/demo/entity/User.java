@@ -10,5 +10,4 @@ public class User {
     private String account;
     private String password;
     private String username;
-    private String authority;
 }

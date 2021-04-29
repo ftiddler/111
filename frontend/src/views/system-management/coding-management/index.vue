@@ -1,4 +1,4 @@
-<!--党员表格-->
+<!--数据表格-->
 <template>
   <div>
     <el-card class="member-box-card">
@@ -6,19 +6,19 @@
         id="input-field"
         v-model="search"
         size="mini"
-        placeholder="输入关键字搜索"
+        placeholder="输入物料编码或名称进行搜索"
       />
-      <el-table id="member-table" ref="memberTable" :key="itemKey" stripe border height="700" style="width: 100%" :data="searchHandler()">
+      <el-table id="member-table" ref="memberTable" :key="itemKey" v-loading="loading" stripe border height="700" style="width: 100%" :data="searchHandler()">
         <el-table-column
           prop="id"
           label="序号"
         />
         <el-table-column
-          prop="matCode"
+          prop="materialCode"
           label="物料编码"
         />
         <el-table-column
-          prop="matName"
+          prop="materialName"
           label="物资名称"
         />
         <el-table-column
@@ -26,8 +26,8 @@
           label="型号及规格"
         />
         <el-table-column
-          prop="measUnit"
-          lebel="计量单位"
+          prop="measureUnit"
+          label="计量单位"
         />
         <el-table-column align="right">
           <template slot="header" slot-scope="scope">
@@ -52,20 +52,22 @@
       </el-table>
     </el-card>
     <!--编辑弹窗-->
-    <el-dialog title="修改信息" :visible.sync="editFormVisible" width="30%">
-      <el-form ref="updForm" :model="updForm">
-        <p>{{ updForm.id }}</p>
+    <el-dialog title="修改信息" :visible.sync="editFormVisible" :before-close="handleEditClose" width="30%">
+      <el-form class="action-form" :model="updForm" label-width="100px">
+        <el-form-item label="序号">
+          <el-input :placeholder="updForm.id" :disabled="true" />
+        </el-form-item>
         <el-form-item label="物料编码">
-          <el-input v-model="updForm.matCode" />
+          <el-input v-model="updForm.materialCode" />
         </el-form-item>
         <el-form-item label="物资名称">
-          <el-input v-model="updForm.matName" />
+          <el-input v-model="updForm.materialName" />
         </el-form-item>
         <el-form-item label="型号及规格">
           <el-input v-model="updForm.modelSpec" />
         </el-form-item>
         <el-form-item label="计量单位">
-          <el-input v-model="updForm.measUnit" />
+          <el-input v-model="updForm.measureUnit" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -74,19 +76,19 @@
       </div>
     </el-dialog>
     <!--添加弹窗-->
-    <el-dialog title="添加党员" :visible.sync="insFormVisible" width="30%">
-      <el-form :model="insForm">
+    <el-dialog title="添加物料" :visible.sync="insFormVisible" :before-close="handleInsClose" width="40%">
+      <el-form class="action-form" :model="insForm" label-width="100px">
         <el-form-item label="物料编码">
-          <el-input v-model="insForm.matCode" />
+          <el-input id="test" v-model="insForm.chgdMaterialCode" />
         </el-form-item>
         <el-form-item label="物资名称">
-          <el-input v-model="insForm.matName" />
+          <el-input v-model="insForm.chgdMaterialName" />
         </el-form-item>
         <el-form-item label="型号及规格">
-          <el-input v-model="insForm.modelSpec" />
+          <el-input v-model="insForm.chgdModelSpec" />
         </el-form-item>
         <el-form-item label="计量单位">
-          <el-input v-model="insForm.measUnit" />
+          <el-input v-model="insForm.chgdMeasureUnit" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -98,7 +100,7 @@
 </template>
 
 <script>
-import { deleteById, insertMaterial, selAllMaterial, selMaxId, updMaterialInfo } from '@/api/system-management'
+import { deleteById, insertMaterial, selAllMaterial, updMaterialInfo } from '@/api/system-management/codeing-management'
 import { getToken } from '@/utils/auth'
 
 export default {
@@ -108,25 +110,21 @@ export default {
       editFormVisible: false,
       insFormVisible: false,
       search: '',
-      maxId: '',
       itemKey: '',
+      loading: false,
       updForm: {
         id: '',
         index: '',
-        matCode: '',
-        matName: '',
+        materialCode: '',
+        materialName: '',
         modelSpec: '',
-        measUnit: '',
-        chgdMatCode: '',
-        chgdMatName: '',
-        chgdModelSpec: '',
-        chgdMeasUnit: ''
+        measureUnit: ''
       },
       insForm: {
-        chgdMatCode: '',
-        chgdMatName: '',
+        chgdmaterialCode: '',
+        chgdmaterialName: '',
         chgdModelSpec: '',
-        chgdMeasUnit: ''
+        chgdmeasureUnit: ''
       },
       headers: {
         Authorization: getToken()
@@ -141,52 +139,56 @@ export default {
       selAllMaterial().then((response) => {
         this.tableData = response.data
       })
-      selMaxId().then((response) => {
-        this.maxId = response.data
-      })
     },
     searchHandler() {
-      return this.tableData.filter(data => !this.search || data.id.toLowerCase().includes(this.search.toLowerCase()) || data.matCode.toLowerCase().includes(this.search.toLowerCase()) || data.matName.toLowerCase().includes(this.search.toLowerCase()))
+      return this.tableData.filter(data => !this.search || data.materialCode.toLowerCase().includes(this.search.toLowerCase()) || data.materialName.toLowerCase().includes(this.search.toLowerCase()))
     },
     handleEdit(index, row) {
       this.editFormVisible = true
       this.updForm.index = index
       this.updForm.id = this.tableData[index].id
-      this.updForm.matCode = row.matCode
-      this.updForm.matName = row.matName
+      this.updForm.materialCode = row.materialCode
+      this.updForm.materialName = row.materialName
       this.updForm.modelSpec = row.modelSpec
-      this.updForm.measUnit = row.measUnit
+      this.updForm.measureUnit = row.measureUnit
     },
     updFormConfirm() {
-      var matCode = this.updForm.chgdMatCode
-        ? this.updForm.chgdMatCode
-        : this.updForm.matCode
-      var matName = this.updForm.chgdMatName
-        ? this.updForm.chgdMatName
-        : this.updForm.matName
-      var modelSpec = this.updForm.chgdModelSpec
-        ? this.updForm.chgdModelSpec
-        : this.updForm.modelSpec
-      var measUnit = this.updForm.chgdMeasUnit
-        ? this.updForm.chgdMeasUnit
-        : this.updForm.measUnit
       this.editFormVisible = false
       updMaterialInfo(
-        this.updForm.id,
-        matCode,
-        matName,
-        modelSpec,
-        measUnit
+        this.updForm.materialCode,
+        this.updForm.materialName,
+        this.updForm.modelSpec,
+        this.updForm.measureUnit,
+        this.updForm.id
       ).then((response) => {
         this.$message.success(response.message)
-        this.tableData[this.updForm.index] = { id: this.updForm.id, matCode: matCode, matName: matName, modelSpec: modelSpec, meadUnit: measUnit }
-        this.itemKey = Math.random()
+        this.loading = true
+        selAllMaterial().then((response) => {
+          this.tableData = response.data
+          this.loading = false
+          this.itemKey = Math.random()
+        })
+        this.updForm.materialCode = ''
+        this.updForm.materialName = ''
+        this.updForm.modelSpec = ''
+        this.updForm.measureUnit = ''
       }).catch((error) => {
         console.log(error)
       })
     },
     updFormCancel() {
       this.editFormVisible = false
+      this.updForm.materialCode = ''
+      this.updForm.materialName = ''
+      this.updForm.modelSpec = ''
+      this.updForm.measureUnit = ''
+    },
+    handleEditClose() {
+      this.editFormVisible = false
+      this.updForm.materialCode = ''
+      this.updForm.materialName = ''
+      this.updForm.modelSpec = ''
+      this.updForm.measureUnit = ''
     },
     handleDelete(index, row) {
       this.$confirm('此操作将删除物料信息, 是否继续?', '提示', {
@@ -196,8 +198,13 @@ export default {
       }).then(() => {
         deleteById(this.tableData[index].id).then((response) => {
           this.$message.success(response.message)
+          this.loading = true
+          selAllMaterial().then((response) => {
+            this.tableData = response.data
+            this.loading = false
+            this.itemKey = Math.random()
+          })
         })
-        this.tableData.splice(index, 1)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -209,24 +216,38 @@ export default {
       this.insFormVisible = true
     },
     insFormConfirm() {
-      if (this.insForm.chgdMatCode === '' || this.insForm.chgdMatName === '' || this.insForm.chgdModelSpec === '' || this.insForm.chgdMeasUnit === '') {
+      if (this.insForm.chgdMaterialCode === '' || this.insForm.chgdMaterialName === '' || this.insForm.chgdModelSpec === '' || this.insForm.chgdMeasureUnit === '') {
         this.$message.error('信息不能为空')
       } else {
-        insertMaterial(this.insForm.chgdMatCode, this.insForm.chgdMatName, this.insForm.chgdModelSpec, this.insForm.chgdMeasUnit).then(response => {
+        insertMaterial(this.insForm.chgdMaterialCode, this.insForm.chgdMaterialName, this.insForm.chgdModelSpec, this.insForm.chgdMeasureUnit).then(response => {
           this.$message.success(response.message)
+          this.insFormVisible = false
+          this.loading = true
+          selAllMaterial().then((response) => {
+            this.tableData = response.data
+            this.loading = false
+            this.itemKey = Math.random()
+          })
+          this.insForm.chgdMaterialCode = ''
+          this.insForm.chgdMaterialName = ''
+          this.insForm.chgdModelSpec = ''
+          this.insForm.chgdMeasureUnit = ''
         })
-        this.maxId = this.maxId + 1
-        this.tableData.push({ id: this.maxId, orgDescribe: this.insForm.seledOrgDescribe, orgName: this.insForm.seledOrgName, roleName: this.insForm.seledRoleName })
-        this.itemKey = Math.random()
-        this.insFormVisible = false
-        this.insForm.chgdMatCode = ''
-        this.insForm.chgdMatName = ''
-        this.insForm.chgdModelSpec = ''
-        this.insForm.chgdMeasUnit = ''
       }
     },
     insFormCancel() {
       this.insFormVisible = false
+      this.insForm.chgdMaterialCode = ''
+      this.insForm.chgdMaterialName = ''
+      this.insForm.chgdModelSpec = ''
+      this.insForm.chgdMeasureUnit = ''
+    },
+    handleInsClose() {
+      this.insFormVisible = false
+      this.insForm.chgdMaterialCode = ''
+      this.insForm.chgdMaterialName = ''
+      this.insForm.chgdModelSpec = ''
+      this.insForm.chgdMeasureUnit = ''
     }
   }
 }
@@ -243,5 +264,8 @@ export default {
   }
   #member-table {
     margin-top: 5px;
+  }
+  .action-form {
+    width: 400px;
   }
 </style>

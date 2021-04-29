@@ -5,6 +5,7 @@ import com.example.demo.auth.service.MyUserService;
 import com.example.demo.auth.util.JwtTokenUtil;
 import com.example.demo.common.ResponseData;
 import com.example.demo.common.ResultObject;
+import com.example.demo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +20,23 @@ public class UserController {
         return ResultObject.successWithData(info);
     }
 
-    @PostMapping("/insert")
-    public ResponseData insertUser(@RequestParam("username") String username, @RequestParam("password") String password,
-    @RequestParam("authority") String authority, @RequestParam("account") String account) {
-        return userService.insertUser(username, password, authority, account);
+    @GetMapping("/selectAll")
+    public ResponseData selectAll() {
+        return userService.selectAll();
+    }
+
+    @PostMapping("/insertUser")
+    public ResponseData insertUser(@RequestBody User user) {
+        return userService.insertUser(user);
+    }
+
+    @PostMapping("/deleteByAccount")
+    public ResponseData deleteByAccount(@RequestParam("account") String account) {
+        return userService.deleteByAccount(account);
+    }
+
+    @PostMapping("/changePasswordByAccount")
+    public ResponseData changePasswordByAccount(@RequestBody User user) {
+        return userService.changePasswordByAccount(user);
     }
 }

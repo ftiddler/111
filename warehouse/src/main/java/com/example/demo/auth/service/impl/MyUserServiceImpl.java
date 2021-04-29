@@ -5,12 +5,15 @@ import com.example.demo.auth.mapper.UserMapper;
 import com.example.demo.auth.service.MyUserService;
 import com.example.demo.auth.util.JwtTokenUtil;
 import com.example.demo.common.ResponseData;
+import com.example.demo.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MyUserServiceImpl implements MyUserService {
@@ -40,10 +43,34 @@ public class MyUserServiceImpl implements MyUserService {
     }
 
     @Override
-    public ResponseData insertUser(String username, String password, String authority, String account) {
-        password = passwordEncoder.encode(password);
-        int i = userMapper.insertUser(username, password, authority, account);
-        if (i > 0) return ResponseData.buildOk("添加成功");
-        return ResponseData.buildError("添加失败");
+    public ResponseData selectAll() {
+        List<User> users = userMapper.selectAll();
+        for(User user: users) {
+            user.setPassword(user.getPassword());
+        }
+        return ResponseData.buildOk(users);
+    }
+
+    @Override
+    public ResponseData insertUser(User user) {
+        String password = passwordEncoder.encode(user.getPassword());
+        int i = userMapper.insertUser(user.getUsername(), password, user.getAccount());
+        if (i > 0) return ResponseData.buildOk();
+        return ResponseData.buildError();
+    }
+
+    @Override
+    public ResponseData deleteByAccount(String account) {
+        int i = userMapper.deleteByAccount(account);
+        if (i > 0) return ResponseData.buildOk();
+        return ResponseData.buildError();
+    }
+
+    @Override
+    public ResponseData changePasswordByAccount(User user) {
+        user.setPassword(passwordEncoder.encode((user.getPassword())));
+        int i = userMapper.changePasswordByAccount(user.getPassword(), user.getAccount());
+        if (i > 0) return ResponseData.buildOk();
+        return ResponseData.buildError();
     }
 }
