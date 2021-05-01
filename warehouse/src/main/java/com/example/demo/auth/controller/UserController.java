@@ -9,6 +9,9 @@ import com.example.demo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Console;
+import java.math.BigInteger;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -25,14 +28,39 @@ public class UserController {
         return userService.selectAll();
     }
 
+    @PostMapping("/selectRoleByAccount")
+    public ResponseData selectRoleByAccount(@RequestParam("account") String account) {
+        return userService.selectRoleByAccount(account);
+    }
+
+    @GetMapping("/selectAllDepartments")
+    public ResponseData selectAllDepartments() {
+        return userService.selectAllDepartments();
+    }
+
+    @GetMapping("/selectAllPositions")
+    public ResponseData selectAllPositions() { return userService.selectAllPositions(); }
+
     @PostMapping("/insertUser")
     public ResponseData insertUser(@RequestBody User user) {
         return userService.insertUser(user);
     }
 
+    @PostMapping("/insertUserRole")
+    public ResponseData insertUserRole(@RequestParam("userId") BigInteger userId, @RequestParam("departmentName") String departmentName,
+                                       @RequestParam("positionName") String positionName) {
+        return userService.insertUserRole(userId, departmentName, positionName);
+    }
+
     @PostMapping("/deleteByAccount")
     public ResponseData deleteByAccount(@RequestParam("account") String account) {
         return userService.deleteByAccount(account);
+    }
+
+    @PostMapping("/deleteUserRole")
+    public ResponseData deleteUserRole(@RequestParam("userId") BigInteger userId, @RequestParam("departmentName") String departmentName,
+                                       @RequestParam("positionName") String positionName) {
+        return userService.deleteUserRole(userId, departmentName, positionName);
     }
 
     @PostMapping("/changePasswordByAccount")

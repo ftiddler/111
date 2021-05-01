@@ -28,8 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String account) throws UsernameNotFoundException {
-        if (account == null || "".equals(account))
-        {
+        if (account == null || "".equals(account)) {
             throw new RuntimeException("用户不能为空");
         }
         // 调用方法查询用户

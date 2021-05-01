@@ -2,14 +2,14 @@ import request from '@/utils/request'
 
 export function selectAll() {
   return request({
-    url: 'purchaseInfoManage/selectAll',
+    url: '/purchaseInfoManage/selectAll',
     method: 'get'
   })
 }
 
 export function insertPurchaseInfo(approver, closing_date, auditor, prepare) {
   return request({
-    url: 'purchaseInfoManage/insertPurchaseInfo',
+    url: '/purchaseInfoManage/insertPurchaseInfo',
     method: 'post',
     data: {
       approver: approver,
@@ -22,7 +22,7 @@ export function insertPurchaseInfo(approver, closing_date, auditor, prepare) {
 
 export function deleteById(id) {
   return request({
-    url: 'purchaseInfoManage/deleteById',
+    url: '/purchaseInfoManage/deleteById',
     method: 'post',
     params: {
       id: id
@@ -32,7 +32,7 @@ export function deleteById(id) {
 
 export function updatePurchaseInfo(approver, closing_date, auditor, prepare, id) {
   return request({
-    url: 'purchaseInfoManage/updatePurchaseInfo',
+    url: '/purchaseInfoManage/updatePurchaseInfo',
     method: 'post',
     data: {
       approver: approver,

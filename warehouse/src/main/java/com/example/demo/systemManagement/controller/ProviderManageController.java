@@ -4,11 +4,13 @@ import com.example.demo.common.ResponseData;
 import com.example.demo.entity.Supplier;
 import com.example.demo.systemManagement.service.ProviderManageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/providerManage")
+@PreAuthorize("hasAuthority('6')")
 public class ProviderManageController {
 
     @Autowired

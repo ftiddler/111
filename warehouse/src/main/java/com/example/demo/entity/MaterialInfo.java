@@ -9,4 +9,5 @@ public class MaterialInfo {
     private String materialName;
     private String modelSpec;
     private String measureUnit;
+    private String materialType;
 }

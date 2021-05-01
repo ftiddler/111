@@ -5,6 +5,7 @@ import com.example.demo.entity.PurchaseInfo;
 import com.example.demo.systemManagement.service.PurchaseInfoManageService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -16,6 +17,7 @@ import java.text.ParseException;
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/purchaseInfoManage")
+@PreAuthorize("hasAuthority('6')")
 public class PurchaseInfoManageController {
 
     @Autowired

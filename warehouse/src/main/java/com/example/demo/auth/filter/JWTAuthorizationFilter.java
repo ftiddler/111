@@ -1,6 +1,7 @@
 package com.example.demo.auth.filter;
 
 import com.example.demo.auth.util.JwtTokenUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import java.util.Collection;
 /**
  * 登录成功后 走此类进行鉴权操作
  */
+@Slf4j
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Autowired
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
@@ -34,7 +36,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain chain) throws IOException, ServletException {
         String tokenHeader = request.getHeader(JwtTokenUtil.TOKEN_HEADER);
 
-        // 若请求头中没有Authorization信息 或是Authorization不以Bearer开头 则直接放行
+        // 若请求头中没有Authorization信息 或是Authorization不以Bearer开头 则直接报错
+        logger.info("执行" + JWTAuthorizationFilter.class );
         if (tokenHeader == null || !tokenHeader.startsWith(JwtTokenUtil.TOKEN_PREFIX))
         {
 //            chain.doFilter(request, response);
@@ -68,6 +71,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         }
         if (username != null)
         {
+            logger.info("权限：" + authorities);
             return new UsernamePasswordAuthenticationToken(username, null,authorities);
         }
         return null;

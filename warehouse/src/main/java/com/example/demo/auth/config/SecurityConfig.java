@@ -2,6 +2,7 @@ package com.example.demo.auth.config;
 
 import com.example.demo.auth.filter.JWTAuthenticationFilter;
 import com.example.demo.auth.filter.JWTAuthorizationFilter;
+import com.example.demo.auth.filter.MyLogoutFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,13 +16,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
+)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -33,6 +39,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private final MyLogoutFilter myLogoutFilter;
+
+    public SecurityConfig(MyLogoutFilter myLogoutFilter) {
+        this.myLogoutFilter = myLogoutFilter;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -52,9 +64,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 //不需要通过登录验证就可以被访问的资源路径
                 .antMatchers("/login").permitAll()
-                // 其余资源任何人都可访问
+                // 其余资源任何人都需验证
                 .anyRequest().authenticated()
                 .and()
+                // 添加登出拦截器
+                .addFilterBefore(myLogoutFilter, LogoutFilter.class)
                 // 添加JWT登录拦截器
                 .addFilterBefore(new JWTAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 // 添加JWT鉴权拦截器

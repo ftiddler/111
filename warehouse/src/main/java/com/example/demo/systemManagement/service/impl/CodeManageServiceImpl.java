@@ -33,8 +33,8 @@ public class CodeManageServiceImpl implements CodeManageService {
 
     @Override
     public ResponseData insertMaterial(MaterialInfo materialInfo) {
-        int i = codeManageInsMapper.insertMaterial(materialInfo.getMaterialCode(), materialInfo.getMaterialName(), materialInfo.getModelSpec(),
-                materialInfo.getMeasureUnit());
+        int i = codeManageInsMapper.insertMaterial(materialInfo.getMaterialName(), materialInfo.getModelSpec(),
+                materialInfo.getMeasureUnit(), materialInfo.getMaterialType());
         if (i > 0) return ResponseData.buildOk();
         return ResponseData.buildError();
     }
@@ -48,8 +48,8 @@ public class CodeManageServiceImpl implements CodeManageService {
 
     @Override
     public ResponseData updateMaterial(MaterialInfo materialInfo) {
-        int i = codeManageUpdMapper.updateMaterial(materialInfo.getMaterialCode(), materialInfo.getMaterialName(), materialInfo.getModelSpec(),
-                materialInfo.getMeasureUnit(), materialInfo.getId());
+        int i = codeManageUpdMapper.updateMaterial(materialInfo.getMaterialName(), materialInfo.getModelSpec(),
+                materialInfo.getMeasureUnit(), materialInfo.getMaterialType(), materialInfo.getId());
         if (i > 0) return ResponseData.buildOk();
         return ResponseData.buildError();
     }

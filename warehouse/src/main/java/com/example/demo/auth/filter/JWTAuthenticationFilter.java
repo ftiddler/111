@@ -2,6 +2,7 @@ package com.example.demo.auth.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.example.demo.auth.util.JwtTokenUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import java.util.Collection;
 /**
  * 验证用户名密码正确后 生成一个token并将token返回给客户端
  */
+@Slf4j
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Autowired
@@ -39,6 +41,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request,HttpServletResponse response) throws AuthenticationException {
         // 从输入流中获取到登录的信息
         // 创建一个token并调用authenticationManager.authenticate() 让Spring security进行验证
+        logger.info("执行" + JWTAuthenticationFilter.class);
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getParameter("username"),request.getParameter("password")));
     }
 

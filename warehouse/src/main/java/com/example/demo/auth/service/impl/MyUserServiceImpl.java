@@ -1,10 +1,16 @@
 package com.example.demo.auth.service.impl;
 
 import com.example.demo.auth.entity.UserInfo;
+import com.example.demo.auth.entity.UserTable;
+import com.example.demo.auth.mapper.RoleMapper;
 import com.example.demo.auth.mapper.UserMapper;
 import com.example.demo.auth.service.MyUserService;
+import com.example.demo.auth.service.RoleService;
 import com.example.demo.auth.util.JwtTokenUtil;
 import com.example.demo.common.ResponseData;
+import com.example.demo.entity.Department;
+import com.example.demo.entity.Position;
+import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +19,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MyUserServiceImpl implements MyUserService {
 
     @Autowired
+    private RoleService roleService;
+
+    @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -44,11 +58,29 @@ public class MyUserServiceImpl implements MyUserService {
 
     @Override
     public ResponseData selectAll() {
-        List<User> users = userMapper.selectAll();
-        for(User user: users) {
-            user.setPassword(user.getPassword());
+        List<UserTable> users = userMapper.selectAll();
+        for (UserTable user: users) {
+            user.setRoles(roleMapper.selectRoleByAccount(user.getAccount()));
         }
         return ResponseData.buildOk(users);
+    }
+
+    @Override
+    public ResponseData selectRoleByAccount(String account) {
+        List<Role> roles = roleMapper.selectRoleByAccount(account);
+        return ResponseData.buildOk(roles);
+    }
+
+    @Override
+    public ResponseData selectAllDepartments() {
+        List<Department> departments = userMapper.selectAllDepartments();
+        return ResponseData.buildOk(departments);
+    }
+
+    @Override
+    public ResponseData selectAllPositions() {
+        List<Position> positions = userMapper.selectAllPositions();
+        return ResponseData.buildOk(positions);
     }
 
     @Override
@@ -60,8 +92,27 @@ public class MyUserServiceImpl implements MyUserService {
     }
 
     @Override
+    public ResponseData insertUserRole(BigInteger userId, String departmentName, String positionName) {
+        Role role = new Role();
+        role.setDepartmentId(roleMapper.selectDepartmentIdByName(departmentName));
+        role.setPositionId(roleMapper.selectPositionIdByName(positionName));
+        role.setDescribe(departmentName + positionName);
+        BigInteger roleId = roleService.insertRole(role);
+        int i = userMapper.insertUserRole(userId, roleId);
+        if (i > 0) return ResponseData.buildOk();
+        return ResponseData.buildError();
+    }
+
+    @Override
     public ResponseData deleteByAccount(String account) {
         int i = userMapper.deleteByAccount(account);
+        if (i > 0) return ResponseData.buildOk();
+        return ResponseData.buildError();
+    }
+
+    @Override
+    public ResponseData deleteUserRole(BigInteger userId, String departmentName, String positionName) {
+        int i = userMapper.deleteUserRole(userId, departmentName + positionName);
         if (i > 0) return ResponseData.buildOk();
         return ResponseData.buildError();
     }

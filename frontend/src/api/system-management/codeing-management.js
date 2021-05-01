@@ -9,15 +9,15 @@ export function selAllMaterial() {
 }
 
 // 更新物料信息
-export function updMaterialInfo(materialCode, materialName, modelSpec, measureUnit, id) {
+export function updMaterialInfo(materialName, modelSpec, measureUnit, materialType, id) {
   return request({
     url: '/codeManage/updateMaterial',
     method: 'post',
     data: {
-      materialCode: materialCode,
       materialName: materialName,
       modelSpec: modelSpec,
       measureUnit: measureUnit,
+      materialType: materialType,
       id: id
     }
   })
@@ -35,15 +35,15 @@ export function deleteById(id) {
 }
 
 // 添加物料信息
-export function insertMaterial(materialCode, materialName, modelSpec, measureUnit) {
+export function insertMaterial(materialName, modelSpec, measureUnit, materialType) {
   return request({
     url: '/codeManage/insertMaterial',
     method: 'post',
     data: {
-      materialCode: materialCode,
       materialName: materialName,
       modelSpec: modelSpec,
-      measureUnit: measureUnit
+      measureUnit: measureUnit,
+      materialType: materialType
     }
   })
 }

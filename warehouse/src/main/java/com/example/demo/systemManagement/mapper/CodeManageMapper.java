@@ -21,17 +21,18 @@ public interface CodeManageMapper {
                 @Result(column = "material_code", property = "materialCode"),
                 @Result(column = "material_name", property = "materialName"),
                 @Result(column = "model_specification", property = "modelSpec"),
-                @Result(column = "measure_unit", property = "measureUnit")
+                @Result(column = "measure_unit", property = "measureUnit"),
+                @Result(column = "material_type", property = "materialType")
         })
         List<MaterialInfo> selectAll();
     }
 
     @Repository
     interface Ins {
-        @Insert("insert into base_information (material_code, material_name, model_specification, measure_unit) " +
-                "values (#{materialCode}, #{materialName}, #{modelSpec}, #{measureUnit})")
-        int insertMaterial(@Param("materialCode") String materialCode, @Param("materialName") String materialName,
-                           @Param("modelSpec") String modelSpec, @Param("measureUnit") String modelUnit);
+        @Insert("insert into base_information (material_name, model_specification, measure_unit, material_type) " +
+                "values (#{materialName}, #{modelSpec}, #{measureUnit}, #{materialType})")
+        int insertMaterial(@Param("materialName") String materialName, @Param("modelSpec") String modelSpec,
+                           @Param("measureUnit") String modelUnit, @Param("materialType") String materialType);
     }
 
     @Repository
@@ -42,9 +43,9 @@ public interface CodeManageMapper {
 
     @Repository
     interface Upd {
-        @Update("update base_information set material_code = #{materialCode}, material_name = #{materialName}, " +
-                "model_specification = #{modelSpec}, measure_unit = #{measureUnit} where id = #{id}")
-        int updateMaterial(@Param("materialCode") String materialCode, @Param("materialName") String materialName,
-                           @Param("modelSpec") String modelSpec, @Param("measureUnit") String modelUnit, @Param("id") Integer id);
+        @Update("update base_information set material_name = #{materialName}, " +
+                "model_specification = #{modelSpec}, measure_unit = #{measureUnit}, material_type = #{materialType} where id = #{id}")
+        int updateMaterial(@Param("materialName") String materialName, @Param("modelSpec") String modelSpec, @Param("measureUnit") String modelUnit,
+                           @Param("materialType") String materialType, @Param("id") Integer id);
     }
 }
