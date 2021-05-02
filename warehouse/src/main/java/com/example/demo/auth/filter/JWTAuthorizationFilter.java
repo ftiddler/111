@@ -37,7 +37,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String tokenHeader = request.getHeader(JwtTokenUtil.TOKEN_HEADER);
 
         // 若请求头中没有Authorization信息 或是Authorization不以Bearer开头 则直接报错
-        logger.info("执行" + JWTAuthorizationFilter.class );
         if (tokenHeader == null || !tokenHeader.startsWith(JwtTokenUtil.TOKEN_PREFIX))
         {
 //            chain.doFilter(request, response);
